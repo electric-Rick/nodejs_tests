@@ -25,26 +25,11 @@ function startWorker(path, cb) {
 
 if(isMainThread){
 
-
-pstree.stdout.on('data', (data)=>{
-	console.log(`stdout: ${data}`);
-})
-pstree.stderr.on('data', (data)=>{
-	console.error(`stderr: ${data}`)
-})
-
-pstree.on('close', (code) =>{
-	console.log(`child process exited with code: ${code}`)
-})
-} else {
-// Inicia o worker em outra thread
-
-	startWorker(__dirname + '/worker-code.js', (err, result) => {
+startWorker(__dirname + '/worker__.js', (err, result) => {
 	if(err) return console.error(err)
- 	 console.log("** COMPUTAÇÃO PESADA FINALIZADA **")
-	 console.log(`Duração = ${(result.end - result.start) / 1000} segundos`)
-
 })
+
+} else {
 
 }
 

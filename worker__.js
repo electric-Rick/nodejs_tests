@@ -2,8 +2,6 @@
  const { spawn } = require('child_process')
  const start = Date.now()
  const pstree = spawn('htop', ['']);
-console.log('Eu executei...')
-
 
       
 pstree.stdout.on('data', (data)=>{

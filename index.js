@@ -1,5 +1,12 @@
-const { Worker, workerData } = require('worker_threads')
+const { Worker, workerData, isMainThread } = require('worker_threads')
 const request = require('request')
+const { spawn } = require('child_process')
+
+const arr_commands = [{'pstree':spawn('pstree', ['-o pid, tid, command',])},]
+const pstree = spawn('pstree', ['-help']);
+
+
+
 
 function startWorker(path, cb) {
 	const worker = new Worker(path, { workerData: null })
@@ -14,18 +21,38 @@ function startWorker(path, cb) {
 	return worker
 }
 
-console.log("Thread principal")
 
+
+if(isMainThread){
+
+
+pstree.stdout.on('data', (data)=>{
+	console.log(`stdout: ${data}`);
+})
+pstree.stderr.on('data', (data)=>{
+	console.error(`stderr: ${data}`)
+})
+
+pstree.on('close', (code) =>{
+	console.log(`child process exited with code: ${code}`)
+})
+} else {
 // Inicia o worker em outra thread
 
-startWorker(__dirname + '/worker-code.js', (err, result) => {
+	startWorker(__dirname + '/worker-code.js', (err, result) => {
 	if(err) return console.error(err)
-  console.log("** COMPUTAÇÃO PESADA FINALIZADA **")
-	console.log(`Duração = ${(result.end - result.start) / 1000} segundos`)
+ 	 console.log("** COMPUTAÇÃO PESADA FINALIZADA **")
+	 console.log(`Duração = ${(result.end - result.start) / 1000} segundos`)
+
 })
 
+}
+
+
+
+
+
+
+
 // Continua com o a execução na thread principal
-request.get('https://www.google.com', (err, resp) => {
-	if(err) return console.error(err)
-	console.log(`Total bytes recebidos = ${resp.body.length}`)
-})
+
